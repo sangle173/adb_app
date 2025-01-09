@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android TV Remote & Command Console</title>
+    <link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/styles.css">
+    <script src="../node_modules/@fortawesome/fontawesome-free/js/all.min.js" defer></script>
+</head>
+<body>
+<div class="container-fluid mt-5">
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mt-4" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="remote-tab" data-bs-toggle="tab" data-bs-target="#remote" type="button"
+                    role="tab" aria-controls="remote" aria-selected="true">TV Remote
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="command-tab" data-bs-toggle="tab" data-bs-target="#command" type="button"
+                    role="tab" aria-controls="command" aria-selected="false">Command Line
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="logs-tab" data-bs-toggle="tab" data-bs-target="#logs" type="button" role="tab"
+                    aria-controls="logs" aria-selected="false">ADB Logs
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Contents -->
+    <div class="tab-content mt-4" id="myTabContent">
+        <!-- TV Remote Tab -->
+        <div class="tab-pane fade show active" id="remote" role="tabpanel" aria-labelledby="remote-tab">
+            <div class="row mt-4">
+                <!-- Device Info Section -->
+                <div class="col-md-6">
+                    <h3>Connected Devices</h3>
+                    <ul class="list-group" id="deviceInfo">
+                        <li class="list-group-item">Fetching devices...</li>
+                    </ul>
+                </div>
+
+                <!-- Remote Control Section -->
+                <div class="col-md-6 d-flex justify-content-center align-items-center">
+                    <div class="remote">
+                        <!-- D-Pad -->
+                        <div class="dpad">
+                            <div class="dpad-row">
+                                <button class="remote-button" id="up"><i class="fas fa-chevron-up"></i></button>
+                            </div>
+                            <div class="dpad-row dpad-middle">
+                                <button class="remote-button" id="left"><i class="fas fa-chevron-left"></i></button>
+                                <button class="remote-button center" id="center">OK</button>
+                                <button class="remote-button" id="right"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                            <div class="dpad-row">
+                                <button class="remote-button" id="down"><i class="fas fa-chevron-down"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons d-flex justify-content-between mt-4">
+                            <button class="remote-button secondary" id="home">
+                                <i class="fas fa-home"></i> Home
+                            </button>
+                            <button class="remote-button secondary" id="back">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </button>
+                        </div>
+
+                        <!-- Volume Controls -->
+                        <div class="volume-controls mt-4 d-flex justify-content-between">
+                            <button class="remote-button volume" id="volume-up">
+                                <i class="fas fa-volume-up"></i> Vol+
+                            </button>
+                            <button class="remote-button volume" id="volume-down">
+                                <i class="fas fa-volume-down"></i> Vol-
+                            </button>
+                        </div>
+
+                        <!-- System Controls -->
+                        <div class="system-controls mt-4">
+                            <button class="remote-button secondary" id="reboot" data-bs-toggle="modal"
+                                    data-bs-target="#rebootModal">
+                                <i class="fas fa-sync-alt"></i> Reboot
+                            </button>
+                            <button class="remote-button secondary danger" style="background-color: red"
+                                    id="factory-reset" data-bs-toggle="modal" data-bs-target="#factoryResetModal">
+                                <i class="fas fa-exclamation-triangle"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Command Line Tab -->
+        <div class="tab-pane fade" id="command" role="tabpanel" aria-labelledby="command-tab">
+            <div class="row mt-3">
+                <!-- Commands List -->
+                <div class="col-md-4">
+                    <h4>Commands</h4>
+                    <ul class="list-group" id="commandList"></ul>
+                </div>
+
+                <!-- Output Console -->
+                <div class="col-md-8">
+                    <h4>Output Console</h4>
+                    <pre id="commandOutput"></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADB Logs Tab -->
+        <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="logs-tab">
+            <h3 class="text-center">ADB Logs</h3>
+            <div class="mb-3">
+                <button class="btn btn-primary" id="saveLog">Save ADB Log</button>
+            </div>
+            <h4>Logs List</h4>
+            <ul class="list-group" id="logList"></ul>
+        </div>
+    </div>
+</div>
+<!-- Reboot Confirmation Modal -->
+<div class="modal fade" id="rebootModal" tabindex="-1" aria-labelledby="rebootModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rebootModalLabel">Confirm Reboot</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to reboot the device?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmReboot">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Factory Reset Confirmation Modal -->
+<div class="modal fade" id="factoryResetModal" tabindex="-1" aria-labelledby="factoryResetModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="factoryResetModalLabel">Confirm Factory Reset</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                WARNING: This will erase all data on the device. Are you sure you want to proceed?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmFactoryReset">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Include Bootstrap JS -->
+<script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Include Renderer JS -->
+<script src="renderer.js"></script>
+</body>
+</html>

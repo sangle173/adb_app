@@ -1,0 +1,152 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #eeeeee; /* Dark background for the app */
+    color: #222;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    margin-top: 20px;
+}
+
+/* Remote Section */
+.remote-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.remote {
+    background: #333;
+    border-radius: 10px;
+    padding: 20px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.remote h3 {
+    color: #fff;
+}
+
+#deviceInfo {
+    background: #fff;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+/* Remote Buttons */
+.remote-button {
+    width: 60px;
+    height: 60px;
+    margin: 5px;
+    border-radius: 50%;
+    font-size: 18px;
+    color: #fff;
+    background: #444;
+    border: 1px solid #666;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.remote-button:hover {
+    background: #555;
+    transform: scale(1.1);
+}
+
+.remote-button:active {
+    transform: scale(0.95);
+    background: #666;
+    box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Special Button Styles */
+.remote-button.center {
+    background: #555;
+    width: 70px;
+    height: 70px;
+}
+
+.remote-button.secondary {
+    width: 100px;
+    background: #666;
+}
+
+.remote-button.volume {
+    width: 120px;
+    background: #555;
+}
+
+/* D-Pad Layout */
+.dpad {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center align all rows */
+}
+
+.dpad-row {
+    display: flex;
+    justify-content: center;
+    margin: 5px 0; /* Add spacing between rows */
+}
+
+.dpad-middle {
+    justify-content: space-between;
+    width: 200px; /* Adjust width to control spacing */
+}
+
+.remote-button i {
+    font-size: 20px;
+    margin-right: 5px; /* Adds spacing between icon and text */
+}
+
+.remote-button.secondary i,
+.remote-button.volume i {
+    font-size: 16px;
+}
+
+/* Tab Content Styles */
+.tab-content {
+    margin-top: 20px;
+}
+
+#commandOutput {
+    background: #000;
+    color: #0f0;
+    padding: 10px;
+    height: 600px;
+    overflow-y: auto;
+    border: 1px solid #444;
+}
+
+/* Nav Tabs */
+.nav-tabs .nav-link {
+    background: #444;
+    color: #fff;
+    border: none;
+    border-radius: 0;
+    margin-right: 5px;
+    transition: background 0.3s, color 0.3s;
+}
+
+.nav-tabs .nav-link:hover {
+    background: #555;
+}
+
+.nav-tabs .nav-link.active {
+    background: burlywood;
+    color: #fff;
+}
+
+/* Utility */
+.text-center {
+    text-align: center;
+}
+
+.remote-button.active {
+    background-color: #007bff; /* Highlight color */
+    box-shadow: 0 0 10px #007bff;
+    transform: scale(1.1);
+}
