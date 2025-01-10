@@ -10,4 +10,5 @@ module.exports = [
     { name: 'Check ApexVersion', description: 'Check Apex', command: 'adb shell cat /apex/com.sonos.player/VERSION' },
     { name: 'Skip BLE', description: 'Force to AP Connect', command: 'adb shell setprop persist.sonos.ble_advertise 0'},
     { name: 'Reboot', description: 'Reboot devices', command: 'adb reboot'},
+    { name: 'Skip Setup', description: 'Skip setup', command: 'adb shell cmd setup override-setup-page SERVICE_AUTHORIZATION'},
 ];

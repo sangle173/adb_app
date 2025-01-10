@@ -144,9 +144,23 @@ body {
 .text-center {
     text-align: center;
 }
-
+.list-group-item img {
+    border-radius: 5px;
+    object-fit: contain;
+}
 .remote-button.active {
     background-color: #007bff; /* Highlight color */
     box-shadow: 0 0 10px #007bff;
     transform: scale(1.1);
+}
+
+.badge {
+    font-size: 0.9rem;
+    padding: 0.5em 0.75em;
+    border-radius: 0.5rem;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545;
+    color: #fff;
 }

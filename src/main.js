@@ -5,8 +5,9 @@ let mainWindow;
 
 app.on('ready', () => {
     mainWindow = new BrowserWindow({
-        width: 1000,
-        height: 700,
+        width: 1200,
+        height: 800,
+        icon: path.join(__dirname, 'assets', 'icon.ico'), // Use your .ico file here
         webPreferences: {
             nodeIntegration: true, // Enable Node.js in renderer
             contextIsolation: false, // Disable context isolation
