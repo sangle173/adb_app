@@ -6,4 +6,8 @@ module.exports = [
     { name: 'Clear Console', description: 'Clear the console output', command: 'cls' },
     { name: 'Check Devices', description: 'Check the devices are connected', command: 'adb devices' },
     { name: 'Monitor log', description: 'Monitor adb logcat', command: 'adb logcat' },
+    { name: 'Check NSUD Build', description: 'Build Info', command: 'adb shell getprop ro.build.fingerprint' },
+    { name: 'Check ApexVersion', description: 'Check Apex', command: 'adb shell cat /apex/com.sonos.player/VERSION' },
+    { name: 'Skip BLE', description: 'Force to AP Connect', command: 'adb shell setprop persist.sonos.ble_advertise 0'},
+    { name: 'Reboot', description: 'Reboot devices', command: 'adb reboot'},
 ];

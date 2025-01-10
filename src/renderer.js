@@ -3,45 +3,102 @@ const adb = require('adbkit');
 const client = adb.createClient();
 const {exec} = require('child_process');
 
-// Fetch and Display ADB Devices
-const updateAdbDevices = () => {
-    const deviceList = document.getElementById('deviceInfo');
-    deviceList.innerHTML = ''; // Clear existing list
+let updateInterval;
 
-    exec('adb devices', (error, stdout, stderr) => {
-        if (error) {
-            console.error('Error executing adb devices:', error);
-            deviceList.innerHTML = '<li class="list-group-item text-danger">Error fetching devices</li>';
-            return;
-        }
+// Fetch and Update Device Info
+const updateDeviceInfo = () => {
+    client.listDevices()
+        .then((devices) => {
+            if (devices.length === 0) {
+                // Handle no devices connected
+                document.getElementById('deviceName').textContent = 'No Device Connected';
+                document.getElementById('androidVersion').textContent = 'N/A';
+                document.getElementById('manufacturer').textContent = 'N/A';
+                document.getElementById('model').textContent = 'N/A';
+                document.getElementById('nsudBuild').textContent = 'N/A'; // Add a placeholder for NSUD Build
+                return;
+            }
 
-        if (stderr) {
-            console.error('ADB stderr:', stderr);
-            deviceList.innerHTML = '<li class="list-group-item text-danger">ADB Error</li>';
-            return;
-        }
+            const deviceId = devices[0].id;
 
-        const devices = stdout
-            .split('\n')
-            .slice(1) // Skip the header line
-            .filter(line => line.trim() && !line.includes('unauthorized')) // Exclude empty lines and unauthorized devices
-            .map(line => line.split('\t')[0]); // Extract the device ID
+            // Fetch device properties with error handling
+            client.shell(deviceId, 'getprop ro.product.model')
+                .then(adb.util.readAll)
+                .then((output) => {
+                    document.getElementById('deviceName').textContent = output.toString().trim();
+                })
+                .catch(() => {
+                    document.getElementById('deviceName').textContent = 'Error Fetching Name';
+                });
 
-        if (devices.length === 0) {
-            deviceList.innerHTML = '<li class="list-group-item text-warning">No devices connected</li>';
-        } else {
-            devices.forEach(device => {
-                const listItem = document.createElement('li');
-                listItem.className = 'list-group-item';
-                listItem.textContent = `Device ID: ${device}`;
-                deviceList.appendChild(listItem);
-            });
-        }
-    });
+            client.shell(deviceId, 'getprop ro.build.version.release')
+                .then(adb.util.readAll)
+                .then((output) => {
+                    document.getElementById('androidVersion').textContent = output.toString().trim();
+                })
+                .catch(() => {
+                    document.getElementById('androidVersion').textContent = 'Error Fetching Version';
+                });
+
+            client.shell(deviceId, 'getprop ro.product.manufacturer')
+                .then(adb.util.readAll)
+                .then((output) => {
+                    document.getElementById('manufacturer').textContent = output.toString().trim();
+                })
+                .catch(() => {
+                    document.getElementById('manufacturer').textContent = 'Error Fetching Manufacturer';
+                });
+
+            client.shell(deviceId, 'getprop ro.product.model')
+                .then(adb.util.readAll)
+                .then((output) => {
+                    document.getElementById('model').textContent = output.toString().trim();
+                })
+                .catch(() => {
+                    document.getElementById('model').textContent = 'Error Fetching Model';
+                });
+
+            // Fetch the NSUD Build info (adb shell getprop ro.build.fingerprint)
+            client.shell(deviceId, 'getprop ro.build.fingerprint')
+                .then(adb.util.readAll)
+                .then((output) => {
+                    document.getElementById('nsudBuild').textContent = output.toString().trim();
+                })
+                .catch(() => {
+                    document.getElementById('nsudBuild').textContent = 'Error Fetching NSUD Build';
+                });
+        })
+        .catch((err) => {
+            console.error('Error fetching device info:', err);
+            document.getElementById('deviceName').textContent = 'Error';
+            document.getElementById('androidVersion').textContent = 'Error';
+            document.getElementById('manufacturer').textContent = 'Error';
+            document.getElementById('model').textContent = 'Error';
+            document.getElementById('nsudBuild').textContent = 'Error'; // Error handling for NSUD Build
+        });
 };
 
-// Trigger ADB Devices Update when Tab is Clicked
-document.getElementById('remote-tab').addEventListener('click', updateAdbDevices);
+// Start Real-Time Updates
+const startRealTimeUpdates = () => {
+    if (updateInterval) clearInterval(updateInterval); // Clear existing interval if any
+    updateDeviceInfo(); // Initial fetch
+    updateInterval = setInterval(updateDeviceInfo, 5000); // Fetch every 5 seconds
+};
+
+// Stop Real-Time Updates
+const stopRealTimeUpdates = () => {
+    if (updateInterval) {
+        clearInterval(updateInterval);
+        updateInterval = null;
+    }
+};
+
+// Start updates when the TV Remote tab is active
+document.getElementById('remote-tab').addEventListener('click', startRealTimeUpdates);
+
+// Stop updates when switching away from the TV Remote tab
+document.getElementById('logs-tab').addEventListener('click', stopRealTimeUpdates);
+document.getElementById('command-tab').addEventListener('click', stopRealTimeUpdates);
 
 
 // Key Mappings for Keyboard Control
@@ -98,6 +155,49 @@ Object.keys(keyboardMappings).forEach((key) => {
         });
     }
 });
+
+// Reboot and reset device function
+// Reboot the device
+const rebootDevice = () => {
+    exec('adb reboot', (error, stdout, stderr) => {
+        if (error) {
+            console.error('Error during reboot:', stderr || error);
+            alert('Failed to reboot the device. Ensure ADB is connected.');
+        } else {
+            alert('Device is rebooting...');
+        }
+        const rebootModal = bootstrap.Modal.getInstance(document.getElementById('rebootModal'));
+        if (rebootModal) rebootModal.hide();
+    });
+};
+
+// Factory Reset the device
+const factoryResetDevice = () => {
+    exec('adb root && adb shell am broadcast -p "android" --receiver-foreground -a android.intent.action.FACTORY_RESET', (error, stdout, stderr) => {
+        if (error) {
+            console.error('Error during factory reset:', stderr || error);
+            alert('Failed to perform factory reset. Ensure ADB is connected.');
+        } else {
+            alert('Factory reset initiated. The device will erase all data.');
+        }
+
+        // Dismiss the modal
+        const factoryResetModal = bootstrap.Modal.getInstance(document.getElementById('factoryResetModal'));
+        if (factoryResetModal) factoryResetModal.hide();
+    });
+};
+
+// Add event listeners for modal buttons
+document.getElementById('confirmReboot').addEventListener('click', () => {
+    rebootDevice();
+});
+
+document.getElementById('confirmFactoryReset').addEventListener('click', () => {
+    factoryResetDevice();
+});
+//End Reboot and reset
+
+
 
 // Command Line Functionality
 const commandList = document.getElementById('commandList');
