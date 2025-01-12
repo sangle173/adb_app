@@ -49,6 +49,7 @@
     "adbkit": "^2.11.1",
     "bootstrap": "^5.3.3",
     "node-fetch": "^2.7.0",
-    "node-ssdp": "^4.0.1"
+    "node-ssdp": "^4.0.1",
+    "node-wifi": "^2.0.16"
   }
 }

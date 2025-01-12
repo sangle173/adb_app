@@ -198,7 +198,6 @@ document.getElementById('confirmFactoryReset').addEventListener('click', () => {
 //End Reboot and reset
 
 
-
 // Command Line Functionality
 const commandList = document.getElementById('commandList');
 const commandOutput = document.getElementById('commandOutput');
@@ -244,10 +243,9 @@ const executeCommand = (command) => {
 };
 
 
-
 const fs = require('fs');
 const path = require('path');
-const { shell } = require('electron');
+const {shell} = require('electron');
 
 // Absolute path for logs directory
 const logsDir = path.resolve(__dirname, 'logs');
@@ -278,7 +276,7 @@ const extractFatalExceptionSections = (filePath) => {
         }
     });
 
-    return { exceptionSections, exceptionCount };
+    return {exceptionSections, exceptionCount};
 };
 
 // Display Logs List
@@ -296,7 +294,7 @@ const displayLogs = () => {
         const filesWithStats = files.map((file) => {
             const filePath = path.join(logsDir, file);
             const stats = fs.statSync(filePath);
-            const { exceptionSections, exceptionCount } = extractFatalExceptionSections(filePath);
+            const {exceptionSections, exceptionCount} = extractFatalExceptionSections(filePath);
             return {
                 file,
                 filePath,
@@ -310,7 +308,7 @@ const displayLogs = () => {
         filesWithStats.sort((a, b) => b.createdAt - a.createdAt);
 
         // Render the sorted file list
-        filesWithStats.forEach(({ file, filePath, createdAt, exceptionSections, exceptionCount }) => {
+        filesWithStats.forEach(({file, filePath, createdAt, exceptionSections, exceptionCount}) => {
             const hasExceptions = exceptionCount > 0;
 
             const listItem = document.createElement('li');
@@ -384,10 +382,8 @@ document.getElementById('saveLog').addEventListener('click', () => {
 document.getElementById('logs-tab').addEventListener('click', displayLogs);
 
 
-
-
 // discovery tab
-const { Client } = require('node-ssdp');
+const {Client} = require('node-ssdp');
 const fetch = require('node-fetch');
 
 let devices = []; // Store all discovered devices
@@ -423,6 +419,7 @@ const discoverDevices = () => {
         let softwareVersion = 'Unknown';
         let modelName = 'Unknown';
         let latency = 'Unknown';
+        let wifiSSID = 'Unknown';
 
         // Skip duplicates based on the IP address
         if (discoveredIPs.has(deviceIP)) {
@@ -448,6 +445,8 @@ const discoverDevices = () => {
             softwareVersion = xml.match(/<softwareVersion>(.*?)<\/softwareVersion>/)?.[1] || softwareVersion;
             modelName = xml.match(/<modelName>(.*?)<\/modelName>/)?.[1] || modelName;
             udn = xml.match(/<UDN>(.*?)<\/UDN>/)?.[1] || udn;
+            // Fetch the WiFi SSID
+            wifiSSID = await fetchWifiSSID(deviceIP);
             // Measure latency using ping
             latency = await new Promise((resolve) => {
                 exec(`ping -n 1 ${deviceIP}`, (error, stdout) => {
@@ -464,7 +463,7 @@ const discoverDevices = () => {
         }
 
         // Add the device to the devices array
-        const device = { deviceIP, macAddress, softwareVersion, modelName, latency, iconUrl, location };
+        const device = {deviceIP, macAddress, softwareVersion, modelName, latency, wifiSSID, iconUrl, location};
         devices.push(device);
 
         // Render the updated table
@@ -480,6 +479,19 @@ const discoverDevices = () => {
         updateStatus('Discovery completed.', false);
         console.log('Discovery completed.');
     }, 10000);
+};
+
+const fetchWifiSSID = (deviceIP) => {
+    return new Promise((resolve) => {
+        exec(`adb connect ${deviceIP} && adb -s ${deviceIP} shell dumpsys wifi | grep 'SSID'`, (error, stdout) => {
+            if (error) {
+                resolve('Unknown'); // Return Unknown if there's an error
+            } else {
+                const ssidMatch = stdout.match(/SSID: "(.*?)"/);
+                resolve(ssidMatch ? ssidMatch[1] : 'Unknown');
+            }
+        });
+    });
 };
 
 // Function to filter devices based on search query
@@ -517,6 +529,7 @@ const renderTable = (filteredDevices) => {
       <td>${device.macAddress}</td>
       <td>${device.softwareVersion}</td>
       <td>${device.latency || 'N/A'}</td>
+       <td>${device.wifiSSID || 'N/A'}</td>
 <!--       <td><a href="${device.location}" target="_blank">${device.location}</a></td>-->
       <td>
         <button class="btn btn-sm btn-primary action-ping" data-ip="${device.deviceIP}" title="Ping">
