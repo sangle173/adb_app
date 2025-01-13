@@ -419,7 +419,6 @@ const discoverDevices = () => {
         let softwareVersion = 'Unknown';
         let modelName = 'Unknown';
         let latency = 'Unknown';
-        let wifiSSID = 'Unknown';
 
         // Skip duplicates based on the IP address
         if (discoveredIPs.has(deviceIP)) {
@@ -446,8 +445,7 @@ const discoverDevices = () => {
             modelName = xml.match(/<modelName>(.*?)<\/modelName>/)?.[1] || modelName;
             udn = xml.match(/<UDN>(.*?)<\/UDN>/)?.[1] || udn;
             // Fetch the WiFi SSID
-            wifiSSID = await fetchWifiSSID(deviceIP);
-            // Measure latency using ping
+
             latency = await new Promise((resolve) => {
                 exec(`ping -n 1 ${deviceIP}`, (error, stdout) => {
                     if (error) {
@@ -463,7 +461,7 @@ const discoverDevices = () => {
         }
 
         // Add the device to the devices array
-        const device = {deviceIP, macAddress, softwareVersion, modelName, latency, wifiSSID, iconUrl, location};
+        const device = {deviceIP, macAddress, softwareVersion, modelName, latency, iconUrl, location};
         devices.push(device);
 
         // Render the updated table
@@ -479,19 +477,6 @@ const discoverDevices = () => {
         updateStatus('Discovery completed.', false);
         console.log('Discovery completed.');
     }, 10000);
-};
-
-const fetchWifiSSID = (deviceIP) => {
-    return new Promise((resolve) => {
-        exec(`adb connect ${deviceIP} && adb -s ${deviceIP} shell dumpsys wifi | grep 'SSID'`, (error, stdout) => {
-            if (error) {
-                resolve('Unknown'); // Return Unknown if there's an error
-            } else {
-                const ssidMatch = stdout.match(/SSID: "(.*?)"/);
-                resolve(ssidMatch ? ssidMatch[1] : 'Unknown');
-            }
-        });
-    });
 };
 
 // Function to filter devices based on search query
@@ -529,7 +514,6 @@ const renderTable = (filteredDevices) => {
       <td>${device.macAddress}</td>
       <td>${device.softwareVersion}</td>
       <td>${device.latency || 'N/A'}</td>
-       <td>${device.wifiSSID || 'N/A'}</td>
 <!--       <td><a href="${device.location}" target="_blank">${device.location}</a></td>-->
       <td>
         <button class="btn btn-sm btn-primary action-ping" data-ip="${device.deviceIP}" title="Ping">
