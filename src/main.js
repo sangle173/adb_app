@@ -26,3 +26,16 @@ app.on('window-all-closed', () => {
         app.quit();
     }
 });
+
+app.on("web-contents-created", (event, contents) => {
+    if (contents.getType() === "webview") {
+        contents.on("will-navigate", (event, url) => {
+            console.log(`Webview navigating to: ${url}`);
+        });
+
+        contents.on("new-window", (event, url) => {
+            event.preventDefault();
+            console.log(`Blocked new window: ${url}`);
+        });
+    }
+});

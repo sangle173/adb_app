@@ -34,6 +34,11 @@
         <li class="nav-item">
             <a class="nav-link" id="discovery-tab" data-bs-toggle="tab" href="#discovery" role="tab" aria-controls="discovery" aria-selected="false">Discovery</a>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="ota-tab" data-bs-toggle="tab" data-bs-target="#content-ota" type="button"
+                    role="tab" aria-controls="content-ota" aria-selected="false">OTA
+            </button>
+        </li>
     </ul>
 
     <!-- Tab Contents -->
@@ -112,13 +117,13 @@
         <div class="tab-pane fade" id="command" role="tabpanel" aria-labelledby="command-tab">
             <div class="row mt-3">
                 <!-- Commands List -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <h4>Commands</h4>
                     <ul class="list-group" id="commandList"></ul>
                 </div>
 
                 <!-- Output Console -->
-                <div class="col-md-8">
+                <div class="col-md-6">
                     <h4>Output Console</h4>
                     <pre id="commandOutput"></pre>
                 </div>
@@ -173,7 +178,10 @@
                 </tbody>
             </table>
         </div>
-
+        <div class="tab-pane fade" id="content-ota" role="tabpanel" aria-labelledby="ota-tab">
+            <webview id="ota-webview" src="http://172.18.100.176/pine_ota"
+                     style="width:100%; height:100vh;"></webview>
+        </div>
     </div>
 </div>
 <!-- Reboot Confirmation Modal -->

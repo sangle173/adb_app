@@ -525,8 +525,11 @@ const renderTable = (filteredDevices) => {
         <button class="btn btn-sm btn-danger action-setstring" data-ip="${device.deviceIP}" title="SetString">
           <i class="bi bi-gear"></i>
         </button>
-        <button class="btn btn-sm btn-secondary action-open-link" data-ip="${device.deviceIP}" title="Open Link">
+        <button class="btn btn-sm btn-secondary action-open-link" data-ip="${device.deviceIP}" title="Diagnostics">
           <i class="bi bi-box-arrow-up-right"></i>
+        </button>
+          <button class="btn btn-sm btn-success action-test-env" data-ip="${device.deviceIP}" title="Test Env">
+          <i class="bi bi-lightning-fill"></i>
         </button>
       </td>
     `;
@@ -568,6 +571,13 @@ const attachActionListeners = () => {
             handleOpenLink(ip);
         });
     });
+
+    document.querySelectorAll('.action-test-env').forEach((button) => {
+        button.addEventListener('click', (event) => {
+            const ip = event.target.closest('button').getAttribute('data-ip');
+            handleTestEnv(ip);
+        });
+    });
 };
 
 // Open the link in a new tab
@@ -592,6 +602,14 @@ const handleSetString = (ip) => {
     const link = `http://${ip}:1400/setstring`;
     window.open(link, '_blank');
 };
+
+// Handle TestEnv action
+const handleTestEnv = (ip) => {
+    const link = `http://${ip}:1400/testenv`;
+    window.open(link, '_blank');
+};
+
+
 // Handle Details action
 const handleDetails = (ip, modelName) => {
     const link = `http://${ip}:1400/status/zp`;
