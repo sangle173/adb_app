@@ -5,6 +5,7 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
+    "start linux": "electron --no-sanbox .",
     "build": "electron-builder"
   },
   "keywords": [],
